@@ -19,3 +19,6 @@ To install your Chrome extension locally:
 
 6. **Extension Installed:**
    - Once selected, the extension will be installed locally and appear in the list of installed extensions.
+
+
+*I have no idea whether it works or not*
