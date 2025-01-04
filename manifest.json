@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Highlight Profile Links",
+  "name": "Highlight Profiles",
   "version": "1.0",
-  "description": "Выделяет текст в формате 'Enryu#9023' красным цветом",
+  "description": "Highlight Marked Profiles with red color",
   "permissions": [
     "activeTab"
   ],
