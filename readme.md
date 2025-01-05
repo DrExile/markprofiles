@@ -23,9 +23,11 @@ To install your Chrome extension locally:
 # Import, export, reset
 
 **Import/export**
+
 Use bottom page's panel for import or export data. Import is additive it adds new profiles to already existing. Excepting empty import data file. See below.
 
 **Reset**
+
 If imported data is empty (empty json file that only contains `{}` ) then current data will be reset.
 
 *All operations requres page refresh*  
