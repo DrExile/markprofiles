@@ -8,8 +8,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.pathofexile.com/trade",
-        "https://*.pathofexile.com/trade2"
+        "https://*.pathofexile.com/trade/*",
+        "https://*.pathofexile.com/trade2/*"
       ],
       "js": ["content.js"]
     }
