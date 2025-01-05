@@ -19,6 +19,13 @@ To install your Chrome extension locally:
 
 6. **Extension Installed:**
    - Once selected, the extension will be installed locally and appear in the list of installed extensions.
+  
+# Import, export, reset
 
+**Import/export**
+Use bottom page's panel for import or export data. Import is additive it adds new profiles to already existing. Excepting empty import data file. See below.
 
-*I have no idea whether it works or not*
+**Reset**
+If imported data is empty (empty json file that only contains `{}` ) then current data will be reset.
+
+*All operations requres page refresh*  
