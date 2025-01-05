@@ -2,12 +2,15 @@
   "manifest_version": 3,
   "name": "Profile Highlighter",
   "version": "1.0",
-  "description": "Highlight marked profiles with red color",
+  "description": "Highlight marked profiles",
   "permissions": ["storage"],
   "host_permissions": ["https://*.pathofexile.com/*"],
   "content_scripts": [
     {
-      "matches": ["https://*.pathofexile.com/*"],
+      "matches": [
+        "https://*.pathofexile.com/trade",
+        "https://*.pathofexile.com/trade2"
+      ],
       "js": ["content.js"]
     }
   ]
