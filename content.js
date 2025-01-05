@@ -1,57 +1,121 @@
 // Prefix for keys in localStorage
 const HIGHLIGHT_STORAGE_PREFIX = 'highlightedProfile_';
 
-// Function to check for the presence of CJK characters
+// Function to check for CJK characters
 function containsCJK(text) {
     const cjkRegex = /[\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/; // CJK character ranges
     return cjkRegex.test(text);
 }
 
-// Function to add "Mark" buttons next to profile links
+// Function to update the color and counter display of an element
+function updateElementAndCounter(element, counterDisplay, counter) {
+    if (counter > 0) {
+        element.style.color = 'green';
+        counterDisplay.style.color = 'green';
+        counterDisplay.textContent = `+${counter}`; // Add "+" for positive numbers
+    } else if (counter < 0) {
+        element.style.color = 'red';
+        counterDisplay.style.color = 'red';
+        counterDisplay.textContent = `${counter}`; // Negative numbers already include "-"
+    } else {
+        element.style.color = ''; // Neutral (no color)
+        counterDisplay.style.color = ''; // Neutral (default color)
+        counterDisplay.textContent = ''; // Hide counter for zero
+    }
+}
+
+// Function to add upvote and downvote buttons with voting logic
 function addButtonsToProfileLinks() {
     const elements = document.querySelectorAll('.profile-link a');
 
     elements.forEach(element => {
         const text = element.textContent.trim();
-        const regex = /^[\w\u0400-\u04FF\u0370-\u03FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]+#[0-9]+$/;
+        const regex = /^[\w\u0400-\u04FF\u0370-\u03FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\s-]+#[0-9]+$/;
 
         if (regex.test(text)) {
-            if (element.nextElementSibling && element.nextElementSibling.classList.contains('highlight-button')) {
+            if (element.nextElementSibling && element.nextElementSibling.classList.contains('vote-buttons')) {
                 return;
             }
 
+            // Check for CJK characters in the first part of the text (before the #)
             const [usernamePart] = text.split('#');
             if (containsCJK(usernamePart)) {
-                element.style.border = '2px solid red';
-                element.style.padding = '2px';
+                element.style.border = '2px solid red'; // Add red border
+                element.style.padding = '2px'; // Add padding for better visibility
             }
 
-            const isHighlighted = localStorage.getItem(HIGHLIGHT_STORAGE_PREFIX + text) === 'true';
-            if (isHighlighted) {
-                element.style.color = 'red';
-            }
+            // Get the current value from localStorage
+            let counter = parseInt(localStorage.getItem(HIGHLIGHT_STORAGE_PREFIX + text)) || 0;
 
-            const button = document.createElement('button');
-            button.textContent = 'Mark';
-            button.classList.add('highlight-button');
-            button.style.marginLeft = '10px';
-            button.style.cursor = 'pointer';
-            button.style.color = 'black';
-            button.style.backgroundColor = '#f0f0f0';
-            button.style.border = '1px solid #ccc';
+            // Create buttons container
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('vote-buttons');
+            buttonsContainer.style.display = 'inline-flex';
+            buttonsContainer.style.alignItems = 'center';
+            buttonsContainer.style.marginLeft = '10px';
 
-            button.addEventListener('click', (event) => {
+            // Create upvote button
+            const upvoteButton = document.createElement('button');
+            upvoteButton.textContent = '▲'; // Thumbs-up icon
+            upvoteButton.style.cursor = 'pointer';
+            upvoteButton.style.border = '1px solid #ccc';
+            upvoteButton.style.backgroundColor = '#f0f0f0';
+            upvoteButton.style.marginRight = '5px';
+            upvoteButton.style.color = 'black';
+
+            // Create counter display
+            const counterDisplay = document.createElement('span');
+            counterDisplay.style.margin = '0 5px';
+            counterDisplay.style.fontWeight = 'bold';
+
+            // Create downvote button
+            const downvoteButton = document.createElement('button');
+            downvoteButton.textContent = '▼'; // Thumbs-down icon
+            downvoteButton.style.cursor = 'pointer';
+            downvoteButton.style.border = '1px solid #ccc';
+            downvoteButton.style.backgroundColor = '#f0f0f0';
+            downvoteButton.style.color = 'black';
+
+            // Apply initial colors and counter
+            updateElementAndCounter(element, counterDisplay, counter);
+
+            // Upvote logic
+            upvoteButton.addEventListener('click', (event) => {
                 event.stopPropagation();
-                if (element.style.color === 'red') {
-                    element.style.color = '';
+                counter += 1;
+
+                if (counter === 0) {
                     localStorage.removeItem(HIGHLIGHT_STORAGE_PREFIX + text);
                 } else {
-                    element.style.color = 'red';
-                    localStorage.setItem(HIGHLIGHT_STORAGE_PREFIX + text, 'true');
+                    localStorage.setItem(HIGHLIGHT_STORAGE_PREFIX + text, counter);
                 }
+
+                // Update colors and counter display
+                updateElementAndCounter(element, counterDisplay, counter);
             });
 
-            element.parentNode.appendChild(button);
+            // Downvote logic
+            downvoteButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                counter -= 1;
+
+                if (counter === 0) {
+                    localStorage.removeItem(HIGHLIGHT_STORAGE_PREFIX + text);
+                } else {
+                    localStorage.setItem(HIGHLIGHT_STORAGE_PREFIX + text, counter);
+                }
+
+                // Update colors and counter display
+                updateElementAndCounter(element, counterDisplay, counter);
+            });
+
+            // Append buttons and counter to the container
+            buttonsContainer.appendChild(upvoteButton);
+            buttonsContainer.appendChild(counterDisplay);
+            buttonsContainer.appendChild(downvoteButton);
+
+            // Add the container next to the element
+            element.parentNode.appendChild(buttonsContainer);
         }
     });
 }
@@ -127,13 +191,13 @@ function addExportImportButtons() {
     document.body.appendChild(container);
 }
 
-// Function to export data to a JSON file
+// Export and Import logic
 function exportData() {
     const allKeys = Object.keys(localStorage).filter(key => key.startsWith(HIGHLIGHT_STORAGE_PREFIX));
     const data = {};
     allKeys.forEach(key => {
         const originalKey = key.replace(HIGHLIGHT_STORAGE_PREFIX, '');
-        data[originalKey] = localStorage.getItem(key);
+        data[originalKey] = parseInt(localStorage.getItem(key));
     });
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -144,7 +208,6 @@ function exportData() {
     URL.revokeObjectURL(url);
 }
 
-// Function to import data from a JSON file
 function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -157,7 +220,7 @@ function importData(event) {
             if (Object.keys(data).length === 0) {
                 const allKeys = Object.keys(localStorage).filter(key => key.startsWith(HIGHLIGHT_STORAGE_PREFIX));
                 allKeys.forEach(key => localStorage.removeItem(key));
-                alert('Storage has been cleared because the imported JSON was empty.');
+                alert('Storage cleared as the imported JSON was empty.');
                 return;
             }
 
@@ -177,6 +240,6 @@ function importData(event) {
 addButtonsToProfileLinks();
 addExportImportButtons();
 
-// Watch for dynamic changes to the page
+// Observe dynamic changes to the page
 const observer = new MutationObserver(addButtonsToProfileLinks);
 observer.observe(document.body, { childList: true, subtree: true });
