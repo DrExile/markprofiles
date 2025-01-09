@@ -30,7 +30,7 @@ function addButtonsToProfileLinks() {
 
     elements.forEach(element => {
         const text = element.textContent.trim();
-        const regex = /^[\w\u0400-\u04FF\u0370-\u03FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u0E00-\u0E7F\u0900-\u097F\s-]+#[0-9]+$/;
+        const regex = /^[\p{L}\u0400-\u04FF\u0370-\u03FF\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u0E00-\u0E7F\u0900-\u097F\s-]+#[0-9]+$/u;
 
         if (regex.test(text)) {
             if (element.nextElementSibling && element.nextElementSibling.classList.contains('vote-buttons')) {
