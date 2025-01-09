@@ -1,9 +1,9 @@
 // Prefix for keys in localStorage
 const HIGHLIGHT_STORAGE_PREFIX = 'highlightedProfile_';
 
-// Function to check for CJK characters
+// Function to check for CJK characters (excluding Japanese)
 function containsCJK(text) {
-    const cjkRegex = /[\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF]/; // CJK character ranges
+    const cjkRegex = /[\u4E00-\u9FFF\uAC00-\uD7AF]/;
     return cjkRegex.test(text);
 }
 
